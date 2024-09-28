@@ -1,0 +1,38 @@
+services:
+  api-venda:
+    container_name: api-venda
+    build:
+      context: .docker/node/
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=development
+    entrypoint: .docker/node/entrypoint.sh
+    ports:
+      - '3006:3006'
+      - '7006:7006'
+    volumes:
+      - .:/home/node/app
+    networks:
+      - codelab-net
+
+  db-venda:
+    container_name: db-venda
+    build:
+      context: ./.docker/postgres
+      dockerfile: Dockerfile
+    command: postgres -c log_statement=all -p 5006
+    volumes:
+      - '.docker/postgres/data:/var/lib/postgresql/data'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=api-venda
+    ports:
+      - '5006:5006'
+    networks:
+      - codelab-net
+
+networks:
+  codelab-net:
+    name: codelab-net
+    external: true
